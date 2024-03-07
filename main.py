@@ -52,6 +52,30 @@ VIEW_DATA_PASSWORD = "Hamma"
 def connect_to_database():
     return psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
 
+
+def create_table_if_not_exists():
+    try:
+        connection = connect_to_database()
+        cursor = connection.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS news_data (
+                id SERIAL PRIMARY KEY,
+                input_text TEXT,
+                url TEXT,
+                num_sentences INTEGER,
+                num_words INTEGER,
+                num_stop_words INTEGER,
+                upos_tag_counts INTEGER
+            )
+        """)
+        connection.commit()
+        connection.close()
+    except (Exception, psycopg2.Error) as error:
+        print("Error while creating PostgreSQL table:", error)
+
+# Call this function to create the table if it doesn't exist
+create_table_if_not_exists()
+
 def clear(lst):
     lst1 = ['!', ',', '.', '?', '-', '"', ':', ';', '/', '_', '(', ')', '{', '}', '[', ']']
     count = 0
