@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Analyzer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa; /* Light gray background */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        h2, h3 {
+            color: #343a40; /* Dark gray text */
+        }
+
+        .url-container {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .url-container input[type="name"],
+        .url-container input[type="url"] {
+            width: calc(100% - 80px);
+            padding: 10px;
+            border: 1px solid #ced4da; /* Gray border */
+            border-radius: 5px;
+            font-size: 16px;
+            color: #495057; /* Dark gray text */
+        }
+
+        .url-container button {
+            padding: 10px 20px;
+            background-color: #007bff; /* Blue button */
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .url-container button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        .data-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1); /* Box shadow */
+            margin-top: 20px;
+        }
+
+        .box {
+            width: calc(25% - 20px);
+            height: 150px;
+            border: 1px solid #ced4da;
+            padding: 10px;
+            margin: 10px;
+            float: left;
+            border-radius: 5px;
+            background-color: #f8f9fa; /* Light gray background */
+        }
+
+        .box p {
+            color: #343a40; /* Dark gray text */
+            font-size: 16px;
+            margin: 0;
+            padding: 5px;
+        }
+
+        .clean-text {
+            clear: both;
+            margin-top: 20px;
+        }
+
+        .clean-text textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            border: 1px solid #ced4da; /* Gray border */
+            border-radius: 5px;
+            font-size: 16px;
+            color: #495057; /* Dark gray text */
+            resize: none;
+        }
+
+        .login-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .login-section h2, .login-section h3 {
+            color: #343a40; /* Dark gray text */
+        }
+
+        .login-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .login-section ul li {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .login-section ul li a {
+            display: block;
+            padding: 10px 20px;
+            background-color: #007bff; /* Blue button */
+            border: none;
+            border-radius: 5px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .login-section ul li a:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        .login-footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 20px;
+            background-color: #343a40;
+            color: #ffffff;
+            width: 100%;
+        }
+
+        .login-footer img {
+            width: 30px;
+            height: auto;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Hello User,</h2>
+        <h3>Welcome to News Analyzer</h3>
+        <div class="url-container">
+            <form action="/" method="post">
+                <input type="text" id="name-input" name="name" placeholder="Enter Your Name" required class="form-control">
+                <br>
+                <input type="url" id="url-input" name="url" placeholder="Enter URL" required class="form-control">
+                <br>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="data-container">
+            <form method="post" action="/view_data">
+                <label for="password">Enter Password to View Data:</label>
+                <input type="password" id="password" name="password" class="form-control">
+                <input type="submit" value="Submit" class="btn btn-primary mt-3">
+            </form>
+
+            <div class="clean-text">
+                <textarea placeholder="Cleaned Text" readonly>{{cleantext}}</textarea>
+            </div>
+
+            <div class="box" id="box1"><p>Number of Words: <br><strong>{{num_words}}</strong></p></div>
+            <div class="box" id="box2"><p>Number of Sentences: <br><strong>{{num_sentences}}</strong></p></div>
+            <div class="box" id="box3"><p>Number of Stopwords: <br><strong>{{num_stop_words}}</strong></p></div>
+            <div class="box" id="box4"><p>POS Tags: <br><strong>{{upos_tag_counts}}</strong></p></div>
+        </div>
+    </div>
+
+    <div class="login-footer">
+        <a href="{{ url_for('github_login') }}"><img src="static/github.png" alt="GitHub Logo"></a>
+        <a href="{{ url_for('index') }}"><img src="static/google.png" alt="Google Logo"></a>
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            alignLoginButtons();
+            window.addEventListener('resize', alignLoginButtons);
+        });
+
+        function alignLoginButtons() {
+            var loginFooter = document.querySelector('.login-footer');
+            var container = document.querySelector('.container');
+            var footerHeight = loginFooter.offsetHeight;
+            var containerHeight = container.offsetHeight;
+            var marginTop = (containerHeight - footerHeight) / 2;
+            loginFooter.style.marginTop = marginTop + 'px';
+        }
+    </script>
+</body>
+</html>

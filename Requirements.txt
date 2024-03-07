@@ -1,0 +1,14 @@
+python-dateutil==2.9.0.post0
+pytz==2024.1
+six==1.16.0
+tzdata==2024.1
+Flask==2.3.0
+psycopg2==2.9.3
+nltk==3.7
+goose3==3.5.0
+authlib==2.4.6
+Flask>=2.2.2
+BeautifulSoup4==4.11.1
+psycopg2~=2.9.3
+authlib>=1.4.0 
+google-auth-oauthlib==1.2.0
