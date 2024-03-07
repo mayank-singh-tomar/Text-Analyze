@@ -5,8 +5,9 @@ tzdata==2024.1
 Flask==2.3.0
 psycopg2==2.9.3
 nltk==3.7
+oauthlib==3.1.1
 goose3>=3.0.0
-authlib==2.4.6
+authlib==0.15.3
 Flask>=2.2.2
 BeautifulSoup4==4.11.1
 psycopg2~=2.9.3
