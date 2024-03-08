@@ -84,7 +84,7 @@ def clear(lst):
             count += 1
     return count
 
-@app.route('/', methods=['GET', 'POST'])  
+@app.route('/', methods=['GET','POST'])  
 def portal():
     if request.method == 'POST':
         url = request.form['url']
@@ -131,7 +131,7 @@ def portal():
     
 
 
-@app.route('/view_data', methods=['POST', 'GET'])
+@app.route('/view_data', methods=['POST','GET'])
 def view_data():
     if request.method == 'POST':
         if request.form['password'] != VIEW_DATA_PASSWORD:
