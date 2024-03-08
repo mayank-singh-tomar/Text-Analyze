@@ -42,10 +42,10 @@ github = oauth.register(
     client_kwargs={'scope': 'user:email'},
 )
 
-DB_NAME = "news_wp0t"  # Update with your actual database name
-DB_USER = "mayank"
-DB_PASSWORD = "nid94ZhqP9l3xix5Y4GcWZXFHzT04yFS"
-DB_HOST = "dpg-cnl1iotjm4es73cb6qh0-a"
+DB_NAME = "news_bder"  # Update with your actual database name
+DB_USER = "news_bder_user"
+DB_PASSWORD = "7yx2KOUu38byViLlnWXBaUIqq95GBXRZ"
+DB_HOST = "dpg-cnlk5g8l6cac73a2jeh0-a"
 
 VIEW_DATA_PASSWORD = "Hamma"
 
@@ -210,6 +210,11 @@ def protected():
     else:
         # User is not authenticated, redirect to the portal page
         return redirect(url_for('index'))
+    
+@app.route('/logout')
+def logout_google():
+    session.clear()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
