@@ -59,7 +59,6 @@ def create_table_if_not_exists():
         cursor = connection.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS news_data (
-                id SERIAL PRIMARY KEY,
                 input_text TEXT,
                 url TEXT,
                 num_sentences INTEGER,
