@@ -82,6 +82,10 @@
             {% endif %}
         </form>
         <h2>Logout</h2>
+        <ul>
+            <li><a href="{{ url_for('github_logout') }}">Logout from GitHub</a></li>
+            <li><a href="{{ url_for('google_logout') }}">Logout from Google</a></li>
+            </ul>
     </div>
 </body>
 </html>
