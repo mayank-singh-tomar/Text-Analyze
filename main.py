@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, url_for, redirect, session
 import re
-import os
 import psycopg2
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
@@ -43,10 +42,10 @@ github = oauth.register(
     client_kwargs={'scope': 'user:email'},
 )
 
-DB_NAME = "news_bder"  # Update with your actual database name
-DB_USER = "news_bder_user"
-DB_PASSWORD = "7yx2KOUu38byViLlnWXBaUIqq95GBXRZ"
-DB_HOST = "dpg-cnlk5g8l6cac73a2jeh0-a"
+DB_NAME = "news"  # Update with your actual database name
+DB_USER = "postgres"
+DB_PASSWORD = "Tiger"
+DB_HOST = "localhost"
 
 VIEW_DATA_PASSWORD = "Hamma"
 
@@ -91,12 +90,9 @@ def portal():
         g = Goose()
         article = g.extract(url=url)
         cleantext = re.sub(r'<.*?>', ' ', article.cleaned_text)
-        connection = connect_to_database()
-        cursor = connection.cursor()
 
         def count_words_without_punctuation(cleantext):
             words = word_tokenize(cleantext)
-            # stop_words = set(stopwords.words('english'))
             return clear(words)
         
         # Task 1: Analyze text
@@ -115,23 +111,26 @@ def portal():
         num_stop_words = len([word for word in words if word.lower() in stop_words])
         upos_tag_counts = len(upos_tag_count)
 
+
         # Task 2: Save to PostgreSQL
+        connection = connect_to_database()
+        cursor = connection.cursor()
         cursor.execute(
             "INSERT INTO news_data (input_text, url, num_sentences, num_words, num_stop_words, upos_tag_counts) VALUES (%s,%s,%s,%s,%s,%s)",
             (cleantext, url, num_sentences, num_words, num_stop_words, upos_tag_counts))
 
         connection.commit()
         connection.close()
-
         return render_template('Text.html', cleantext=cleantext, num_sentences=num_sentences, 
                                num_words=num_words, num_stop_words=num_stop_words, 
                                upos_tag_counts=upos_tag_counts)
+
 
     return render_template('Text.html')
     
 
 
-@app.route('/view_data', methods=['POST','GET'])
+@app.route('/view_data',methods=['POST','GET'])
 def view_data():
     if request.method == 'POST':
         if request.form['password'] != VIEW_DATA_PASSWORD:
@@ -145,7 +144,7 @@ def view_data():
 
             connection.close()
             return render_template('login_page.html', data=data)
-   # return render_template('Text.html')
+    return render_template('Text.html')
 
 # Github login route
 @app.route('/login/github')
@@ -155,27 +154,40 @@ def github_login():
     return github.authorize_redirect(redirect_uri)
 
 
+github_admin_usernames = ["mayank-singh-tomar", "atmabodha"]
 # Github authorize route
 @app.route('/login/github/authorize')
 def github_authorize():
-    github = oauth.create_client('github')
-    token = github.authorize_access_token()
-    session['github_token'] = token
-    resp = github.get('user').json()
-    print(f"\n{resp}\n")
-    connection = connect_to_database()
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM news_data")
-    data = cursor.fetchall()
+    try:
+        github = oauth.create_client('github')
+        token = github.authorize_access_token()
+        session['github_token'] = token
+        resp = github.get('user').json()
+        print(f"\n{resp}\n")
+        logged_in_username = resp.get('login')
+        if logged_in_username in github_admin_usernames:
+            connection = connect_to_database()
+            cursor = connection.cursor()
 
-    connection.close()
-    return render_template("login_page.html", data=data)
+            cursor.execute("SELECT * FROM news_data")
+            data = cursor.fetchall()
+
+            connection.close()
+            return render_template("login_page.html", data=data)
+        else:
+            return redirect(url_for('index'))
+    except:
+        return redirect(url_for('index'))
+
 
 # Logout route for GitHub
 @app.route('/logout/github')
 def github_logout():
-    session.pop('github_token', None)
+    session.clear()
+    # session.pop('github_token', None)()
+    print("logout")
     return redirect(url_for('index'))
+
 
 @app.route('/index')
 def index():
@@ -217,5 +229,4 @@ def logout_google():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(debug=True)
