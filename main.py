@@ -145,7 +145,7 @@ def view_data():
 
             connection.close()
             return render_template('login_page.html', data=data)
-    return render_template('Text.html')
+   # return render_template('Text.html')
 
 # Github login route
 @app.route('/login/github')
