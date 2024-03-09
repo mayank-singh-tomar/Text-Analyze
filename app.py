@@ -121,13 +121,10 @@ def portal():
 
         connection.commit()
         connection.close()
-        return render_template('index.html', cleantext=cleantext, num_sentences=num_sentences, 
-                               num_words=num_words, num_stop_words=num_stop_words, 
+       
+        return render_template('Text.html', cleantext=cleantext, num_sentences=num_sentences,num_words=num_words, num_stop_words=num_stop_words, 
                                upos_tag_counts=upos_tag_counts)
-
-
     return render_template('index.html')
-    
 
 
 @app.route('/view_data',methods=['POST','GET'])
