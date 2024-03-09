@@ -42,10 +42,10 @@ github = oauth.register(
     client_kwargs={'scope': 'user:email'},
 )
 
-DB_NAME = "news"  # Update with your actual database name
-DB_USER = "postgres"
-DB_PASSWORD = "Tiger"
-DB_HOST = "localhost"
+DB_NAME = "news_bder"  # Update with your actual database name
+DB_USER = "news_bder_user"
+DB_PASSWORD = "7yx2KOUu38byViLlnWXBaUIqq95GBXRZ"
+DB_HOST = "dpg-cnlk5g8l6cac73a2jeh0-a"
 
 VIEW_DATA_PASSWORD = "Hamma"
 
