@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, url_for, redirect, session
 import re
+import os
 import psycopg2
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
@@ -217,5 +218,4 @@ def logout_google():
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=port, debug=True)
