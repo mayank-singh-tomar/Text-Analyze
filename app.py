@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, url_for, redirect, session
+import requests
 import re
 import psycopg2
 from nltk.tokenize import word_tokenize, sent_tokenize
@@ -60,7 +61,8 @@ def create_table_if_not_exists():
         connection = connect_to_database()
         cursor = connection.cursor()
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS news_data (
+            CREATE TABLE IF NOT EXISTS news_form (
+                username TEXT,
                 input_text TEXT,
                 url TEXT,
                 num_sentences INTEGER,
@@ -88,9 +90,11 @@ def clear(lst):
 @app.route('/', methods=['GET','POST'])  
 def portal():
     if request.method == 'POST':
+        name= request.form['name']
         url = request.form['url']
         g = Goose()
         article = g.extract(url=url)
+        news_title = article.title
         cleantext = re.sub(r'<.*?>', ' ', article.cleaned_text)
 
         def count_words_without_punctuation(cleantext):
@@ -118,12 +122,12 @@ def portal():
         connection = connect_to_database()
         cursor = connection.cursor()
         cursor.execute(
-            "INSERT INTO news_data (input_text, url, num_sentences, num_words, num_stop_words, upos_tag_counts) VALUES (%s,%s,%s,%s,%s,%s)",
-            (cleantext, url, num_sentences, num_words, num_stop_words, upos_tag_counts))
+            "INSERT INTO news_form (username,input_text, url, num_sentences, num_words, num_stop_words, upos_tag_counts) VALUES (%s,%s,%s,%s,%s,%s,%s)",
+            (name,cleantext, url, num_sentences, num_words, num_stop_words, upos_tag_counts))
 
         connection.commit()
         connection.close()
-        return render_template('index.html', cleantext=cleantext, num_sentences=num_sentences, 
+        return render_template('index.html', news_title=news_title, cleantext=cleantext, num_sentences=num_sentences, 
                                num_words=num_words, num_stop_words=num_stop_words, 
                                upos_tag_counts=upos_tag_counts)
 
@@ -141,7 +145,7 @@ def view_data():
             connection = connect_to_database()
             cursor = connection.cursor()
 
-            cursor.execute("SELECT * FROM news_data")
+            cursor.execute("SELECT * FROM news_form")
             data = cursor.fetchall()
 
             connection.close()
@@ -171,15 +175,15 @@ def github_authorize():
             connection = connect_to_database()
             cursor = connection.cursor()
 
-            cursor.execute("SELECT * FROM news_data")
+            cursor.execute("SELECT * FROM news_form")
             data = cursor.fetchall()
 
             connection.close()
             return render_template("login_page.html", data=data)
         else:
-            return redirect(url_for('index'))
+            return redirect(url_for('portal'))
     except:
-        return redirect(url_for('index'))
+        return redirect(url_for('portal'))
 
 
 # Logout route for GitHub
@@ -188,7 +192,7 @@ def github_logout():
     session.clear()
     # session.pop('github_token', None)()
     print("logout")
-    return redirect(url_for('index'))
+    return redirect(url_for('portal'))
 
 
 @app.route('/index')
@@ -208,28 +212,41 @@ def callback():
     session['google_token'] = flow.credentials.token
 
     # Redirect to the protected route or another page
-    return redirect(url_for('protected'))
+    return redirect(url_for('index'))
+
+# Protected route accessible only to authenticated users
+# Define the allowed email addresses
+allowed_emails = ['su-23020@sitare.org','kushal@sitare.org']
 
 @app.route('/protected')
 def protected():
     if 'google_token' in session:
         # User is authenticated
-        connection = connect_to_database()
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM news_data")
-        data = cursor.fetchall()
+         # Get the user's email from the Google API
+        userinfo = requests.get('https://www.googleapis.com/oauth2/v2/userinfo', headers={'Authorization': f'Bearer {session["google_token"]}'})
+        email = userinfo.json().get('email')
 
-        connection.close()
-        return render_template("login_page.html", data=data) 
+        if email in allowed_emails:
+            connection = connect_to_database()
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM news_form")
+            data = cursor.fetchall()
+            connection.close()
+
+            return render_template("login_page.html", data=data)
+        else:
+            email=None
+              # User is not authorize
+            return redirect(url_for('portal'))
+
     else:
         # User is not authenticated, redirect to the portal page
-        return redirect(url_for('index'))
+        return redirect(url_for('portal'))
     
 @app.route('/logout')
 def logout_google():
     session.clear()
-    return redirect(url_for('index'))
+    return redirect(url_for('portal'))
 
 if __name__ == '__main__':
     app.run(debug=True)
-

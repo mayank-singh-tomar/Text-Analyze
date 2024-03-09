@@ -24,6 +24,7 @@
             background-color: white;
             border-radius: 10px;
             overflow: hidden;
+            border: 2px solid #dee2e6; /* Add border to the table */
         }
 
         th, td {
@@ -40,24 +41,35 @@
         tr:nth-child(even) {
             background-color: #f2f2f2; /* Alternate row background color */
         }
+
         /* Adjust the width of the 'Analysed Text' column */
-        td:nth-child(0) {
-        width:30%; /* Adjust this value as needed */
+        td:nth-child(2) {
+            width: 30%; /* Adjust this value as needed */
         }
+
         .container {
             max-width: 1500px;
             margin: 0 auto;
+            position: relative;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <a href="{{ url_for('github_logout') }}" class="btn btn-danger logout-btn">Logout</a>
         <form method="post" action="/view_data">
             {% if data %}
             <h1>View Data</h1>
             <table class="table table-striped">
                 <thead>
                     <tr>
+                        <th>User name</th>
                         <th>Analysed Text</th>
                         <th>URL</th>
                         <th>No. of Sentences</th>
@@ -75,16 +87,13 @@
                         <td>{{ row[3] }}</td>
                         <td>{{ row[4] }}</td>
                         <td>{{ row[5] }}</td>
+                        <td>{{ row[6] }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
             {% endif %}
         </form>
-        <h2>Logout</h2>
-        <ul>
-            <li><a href="{{ url_for('github_logout') }}">Logout from GitHub</a></li>
-        </ul>
     </div>
 </body>
 </html>
