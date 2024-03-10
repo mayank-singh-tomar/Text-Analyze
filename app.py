@@ -168,6 +168,7 @@ def github_authorize():
         token = github.authorize_access_token()
         session['github_token'] = token
         resp = github.get('user').json()
+        print(f"\n{resp}\n")
         logged_in_username = resp.get('login')
         if logged_in_username in github_admin_usernames:
             connection = connect_to_database()
