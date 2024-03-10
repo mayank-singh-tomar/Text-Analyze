@@ -8,6 +8,7 @@ Flask>=2.2.2
 BeautifulSoup4==4.11.1
 psycopg2~=2.9.3
 google-auth-oauthlib==1.2.0
+requests==2.26.0
 
 
 gunicorn
