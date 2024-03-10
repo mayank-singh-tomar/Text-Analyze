@@ -31,7 +31,7 @@ client_secrets_file = 'client_secret_2_126959989022-htfd7knd8jbv2englh276fnkq75i
 scopes = ['https://www.googleapis.com/auth/userinfo.profile',
           'https://www.googleapis.com/auth/userinfo.email',
           'openid']
-redirect_uri = 'http://127.0.0.1:5000/callback'
+redirect_uri = 'https://text-analyze-1cfo.onrender.com/callback'
 # Create the OAuth flow object
 flow = Flow.from_client_secrets_file(client_secrets_file, scopes=scopes, redirect_uri=redirect_uri)
 
