@@ -6,7 +6,9 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.tag import pos_tag
 import nltk
-nltk.download('all')
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')
 from authlib.integrations.flask_client import OAuth
 from google_auth_oauthlib.flow import Flow
 from google.oauth2 import id_token
@@ -152,16 +154,13 @@ def view_data():
             return render_template('login_page.html', data=data)
     return render_template('index.html')
 
-# Github login route
+github_admin_usernames = ["mayank-singh-tomar", "atmabodha"]
 @app.route('/login/github')
 def github_login():
     github = oauth.create_client('github')
     redirect_uri = url_for('github_authorize', _external=True)
     return github.authorize_redirect(redirect_uri)
 
-
-github_admin_usernames = ["mayank-singh-tomar", "atmabodha"]
-# Github authorize route
 @app.route('/login/github/authorize')
 def github_authorize():
     try:
@@ -169,15 +168,12 @@ def github_authorize():
         token = github.authorize_access_token()
         session['github_token'] = token
         resp = github.get('user').json()
-        print(f"\n{resp}\n")
         logged_in_username = resp.get('login')
         if logged_in_username in github_admin_usernames:
             connection = connect_to_database()
             cursor = connection.cursor()
-
             cursor.execute("SELECT * FROM news_form")
             data = cursor.fetchall()
-
             connection.close()
             return render_template("login_page.html", data=data)
         else:
@@ -185,12 +181,9 @@ def github_authorize():
     except:
         return redirect(url_for('portal'))
 
-
-# Logout route for GitHub
 @app.route('/logout/github')
 def github_logout():
     session.clear()
-    # session.pop('github_token', None)()
     print("logout")
     return redirect(url_for('portal'))
 
