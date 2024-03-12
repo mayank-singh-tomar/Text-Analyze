@@ -18,7 +18,7 @@ from goose3 import Goose
 
 app = Flask(__name__)
 
-app.secret_key = 'hello'  #google
+app.secret_key = 'hello'  
 
 oauth = OAuth(app)
 app.config['SECRET_KEY'] = "THIS SHOULD BE SECRET"
@@ -47,6 +47,7 @@ github = oauth.register(
     client_kwargs={'scope': 'user:email'},
 )
 
+#Databse connecion
 DB_NAME = "news_bder"
 DB_USER = "news_bder_user"
 DB_PASSWORD = "7yx2KOUu38byViLlnWXBaUIqq95GBXRZ"
@@ -103,7 +104,7 @@ def portal():
             words = word_tokenize(cleantext)
             return clear(words)
         
-        # Task 1: Analyze text
+        #1 Analyze text
         sentences = sent_tokenize(cleantext)
         words = word_tokenize(cleantext)
         stop_words = set(stopwords.words('english'))
@@ -120,7 +121,7 @@ def portal():
         upos_tag_counts = len(upos_tag_count)
 
 
-        # Task 2: Save to PostgreSQL
+        #2 Save to PostgreSQL
         connection = connect_to_database()
         cursor = connection.cursor()
         cursor.execute(
