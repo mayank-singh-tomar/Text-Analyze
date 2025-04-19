@@ -40,9 +40,9 @@ Google and GitHub login integration
 User-friendly interface
 
 # 🛠️ Tech Stack
-Backend: Python (FastAPI / Flask) (assumed, please update if different)
+Backend: Python (Flask) 
 
-Frontend: HTML, CSS, JavaScript
+Frontend: HTML, CSS
 
 Authentication: OAuth (Google and GitHub)
 
